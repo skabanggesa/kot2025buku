@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Program Kejohanan Olahraga Tahunan SK Abang Gesa 2025</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+    
+    <div id="flash-page">
+        </div>
+    
+    <header>
+        </header>
+    <main>
+        <section class="menu-pdf">
+            <h2><i class="fa-solid fa-list-check"></i> Menu Program</h2>
+            <nav id="pdf-navigation">
+                </nav>
+        </section>
+
+        <section class="pdf-viewer">
+            <h2><i class="fa-solid fa-file-pdf"></i> Paparan Dokumen</h2>
+            
+            <div id="pdf-container">
+                <iframe id="pdf-frame" src="TENTATIF.pdf" frameborder="0"></iframe>
+                <p class="citation">
+                    <i class="fa-solid fa-info-circle"></i> Dokumen Semasa: **<span id="current-pdf-name">TENTATIF.pdf</span>**
+                </p>
+            </div>
+            
+            <div id="upload-container" style="display:none;">
+                <h2><i class="fa-solid fa-camera"></i> Muat Naik Gambar Anda!</h2>
+                <p>Kongsi momen terbaik kejohanan. Gambar akan disemak sebelum diterbitkan.</p>
+                <form id="upload-form">
+                    <input type="file" id="image-upload" name="image" accept="image/*" required>
+                    <button type="submit"><i class="fa-solid fa-upload"></i> Hantar Gambar</button>
+                </form>
+                <p id="upload-status" class="status-message"></p>
+                
+                <div id="image-preview-container" style="margin-top: 20px; text-align: center;">
+                    <img id="uploaded-image-preview" style="max-width: 100%; max-height: 400px; border: 2px solid #ccc; display: none;" alt="Gambar yang dimuat naik">
+                    <p id="preview-caption" style="display: none; font-style: italic; color: #555;">Ini adalah pratonton gambar yang baru dimuat naik.</p>
+                </div>
+                
+            </div>
+
+        </section>
+        
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SK Abang Gesa. Bersukanlah untuk Kesihatan! <i class="fa-solid fa-running"></i></p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>

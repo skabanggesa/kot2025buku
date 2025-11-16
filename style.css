@@ -1,0 +1,305 @@
+/* GAYA UNTUK FLASH PAGE (SPLASH SCREEN) */
+#flash-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('bg.png'); /* PASTIKAN FAIL bg.png ADA */
+    background-size: cover;
+    background-position: center;
+    background-color: #004d99; /* Fallback color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; 
+    opacity: 1;
+    transition: opacity 1s ease-out; /* Kesan fade-out */
+}
+
+#flash-page.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.flash-content {
+    text-align: center;
+    color: white;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 15px;
+    max-width: 80%;
+}
+
+.flash-content h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.flash-content h2 {
+    font-size: 1.5em;
+    color: #ffd700;
+    margin-bottom: 30px;
+}
+
+.splash-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+    color: #ffd700;
+    animation: bounce 2s infinite;
+}
+
+/* Gaya Loader ringkas */
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #ffd700;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 10px auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-15px);
+    }
+    60% {
+        transform: translateY(-7px);
+    }
+}
+
+
+/* Tetapan Asas Buku Program */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e9eef2;
+    color: #333;
+}
+
+header {
+    background-color: #004d99;
+    color: white;
+    padding: 25px 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* GAYA HEADER BARU DENGAN IMEJ */
+.header-content-custom {
+    display: flex; /* Aktifkan Flexbox */
+    align-items: center; /* Selarikan item secara menegak */
+    justify-content: space-between; /* Jarak antara item */
+    margin-bottom: 10px;
+    padding: 0 15px; /* Jarak di tepi */
+}
+
+.header-icon {
+    /* SAIZ BARU UNTUK KIKON & BIKON */
+    width: 100px; /* Saiz imej standard DIBESARKAN */
+    height: auto;
+    object-fit: contain;
+    /* Efek pantulan untuk imej yang mengadap ke dalam */
+    transform: scaleX(1); 
+}
+
+/* Tambah efek flip horizontal pada ikon kiri agar ia menghadap ke tengah (opsional, tetapi dinasihatkan) */
+.icon-kiri {
+    transform: scaleX(-1);
+}
+
+.main-title-container {
+    display: flex;
+    flex-direction: column; /* Ikon di atas, H1 di bawah */
+    align-items: center;
+    text-align: center;
+    flex-grow: 1; /* Benarkan ia mengambil ruang tengah */
+    margin: 0 10px;
+}
+
+.icon-tengah {
+    width: 110px; /* Rikon (tengah) kekal saiz sedia ada */
+    margin-bottom: 5px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.2em;
+    letter-spacing: 1px;
+    line-height: 1.1;
+}
+
+header p {
+    margin: 5px 0;
+    font-size: 1.1em;
+}
+
+
+/* Susun Atur Utama (Desktop) */
+main {
+    display: flex;
+    max-width: 1280px;
+    margin: 25px auto;
+    padding: 0 20px;
+    gap: 25px;
+}
+
+.menu-pdf, .pdf-viewer {
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.menu-pdf {
+    flex: 1;
+    min-width: 280px;
+    max-height: 700px;
+}
+
+.pdf-viewer {
+    flex: 3;
+}
+
+.menu-pdf h2, .pdf-viewer h2 {
+    color: #004d99;
+    border-bottom: 2px solid #ffd700;
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+/* Butang Navigasi PDF */
+#pdf-navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pdf-button {
+    background-color: #f0f0f0;
+    color: #333;
+    border: none;
+    padding: 12px 15px;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+    font-weight: 600;
+}
+
+.pdf-button:hover {
+    background-color: #e0e0e0;
+}
+
+.pdf-button.active {
+    background-color: #ffd700;
+    color: #004d99;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Iframe dan Maklumat */
+#pdf-frame {
+    width: 100%;
+    /* Default height for PDF */
+    height: 650px; 
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.citation {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: #666;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.citation i {
+    margin-right: 5px;
+    color: #004d99;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: 30px;
+    font-size: 0.9em;
+}
+
+/* 📱 Reka Bentuk Responsif (untuk peranti mudah alih) */
+@media (max-width: 850px) {
+    main {
+        flex-direction: column;
+        padding: 0 15px;
+    }
+
+    .menu-pdf {
+        min-width: 100%;
+        margin-bottom: 15px;
+        order: 1;
+    }
+
+    .pdf-viewer {
+        order: 2;
+    }
+    
+    /* Susun atur butang navigasi mendatar */
+    #pdf-navigation {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        gap: 10px;
+    }
+
+    .pdf-button {
+        flex-shrink: 0;
+        min-width: 140px;
+        text-align: center;
+    }
+
+    #pdf-frame {
+        height: 400px;
+    }
+    
+    /* RESPONSIVE HEADER BARU */
+    .header-content-custom {
+        padding: 0 5px;
+    }
+    
+    .header-icon {
+        /* SAIZ BARU UNTUK KIKON & BIKON MOBILE */
+        width: 75px; /* Kecilkan sedikit ikon pada peranti mudah alih DIBESARKAN */
+    }
+
+    .icon-tengah {
+        width: 80px; /* Rikon (tengah) mobile kekal saiz sedia ada */
+    }
+
+    header h1 {
+        font-size: 1.6em;
+    }
+    
+    .flash-content h1 {
+        font-size: 1.8em;
+    }
+
+    .flash-content h2 {
+        font-size: 1.2em;
+    }
+}
