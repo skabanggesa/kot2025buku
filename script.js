@@ -17,12 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const app = firebase.initializeApp(firebaseConfig);
     const storage = app.storage();
     const storageRef = storage.ref(); 
-    // ... (Kod FLASH PAGE, NAVIGASI, dan MUAT NAIK GAMBAR) ...
-    // ... (Fungsi loadContent kini mengendalikan jenis "upload") ...
-    // ... (Tatasusunan allItems kini mengandungi item { name: "Muat Naik Gambar", type: "upload", icon: "fa-camera" }) ...
-    // ... (Logik muat naik di bawah kini menggunakan storage.ref().child().put(file) yang sebenar) ...
-
-    // [Kod selebihnya tidak berubah dari versi Firebase terakhir yang berfungsi]
     
     // --- 1. KOD UNTUK FLASH PAGE ---
     const flashPage = document.getElementById('flash-page');
@@ -40,11 +34,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // ---------------------------------
     
     
-    // --- 2. KOD UNTUK NAVIGASI PDF & MUAT NAIK GAMBAR SEBAGAI TAB ---
+    // --- 2. KOD UNTUK NAVIGASI PDF, CSV & MUAT NAIK GAMBAR SEBAGAI TAB ---
     
-    // Fail PDF
-    const pdfFiles = [
-        { name: "Tentatif Program", type: "pdf", file: "TENTATIF.pdf", icon: "fa-calendar-days" },
+    // Fail Dokumen/Kandungan (TENTATIF ditukar kepada CSV)
+    const documentFiles = [
+        { name: "Tentatif Program", type: "csv", file: "TENTATIF.csv", icon: "fa-calendar-days" },
         { name: "Rekod Kejohanan", type: "pdf", file: "REKOD KEJOHANAN.pdf", icon: "fa-medal" },
         { name: "Peserta Rumah Biru", type: "pdf", file: "PESERTA BIRU.pdf", icon: "fa-water" },
         { name: "Peserta Rumah Kuning", type: "pdf", file: "ATLET RUMAH KUNING.pdf", icon: "fa-sun" },
@@ -57,17 +51,81 @@ document.addEventListener('DOMContentLoaded', function() {
         icon: "fa-camera" 
     };
 
-    const allItems = [...pdfFiles, imageUploadItem]; 
+    const allItems = [...documentFiles, imageUploadItem]; 
 
     const navContainer = document.getElementById('pdf-navigation');
     const pdfContainer = document.getElementById('pdf-container');
     const uploadContainer = document.getElementById('upload-container');
     const pdfFrame = document.getElementById('pdf-frame');
+    const csvContent = document.getElementById('csv-content'); // Elemen baharu untuk paparan CSV
     const currentPdfName = document.getElementById('current-pdf-name');
 
     uploadContainer.style.display = 'none';
-    pdfFrame.src = allItems[0].file;
+    pdfFrame.style.display = 'none'; // Sembunyikan iframe secara lalai
+    csvContent.style.display = 'block'; // Paparkan CSV content secara lalai untuk item pertama
     currentPdfName.textContent = allItems[0].file;
+
+    // Fungsi untuk memuatkan dan memaparkan kandungan CSV
+    function loadCSVContent(filePath) {
+        // Paparkan status memuatkan
+        csvContent.innerHTML = '<p>Memuatkan Tentatif Program...</p>'; 
+
+        fetch(filePath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Ralat HTTP! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                // Logik asas untuk menukar CSV kepada jadual HTML
+                const rows = data.split('\n').filter(row => row.trim() !== '');
+                if (rows.length === 0) {
+                    csvContent.innerHTML = '<p>Fail CSV kosong atau tidak sah.</p>';
+                    return;
+                }
+                
+                const table = document.createElement('table');
+                table.classList.add('tentatif-table');
+                let html = '';
+                
+                // Header (baris pertama CSV)
+                const headers = rows[0].split(',');
+                html += '<thead><tr>';
+                headers.forEach(header => {
+                    html += `<th>${header.trim()}</th>`;
+                });
+                html += '</tr></thead><tbody>';
+                
+                // Baris Data (baris kedua dan seterusnya)
+                for (let i = 1; i < rows.length; i++) {
+                    const cells = rows[i].split(',');
+                    // Semak jika bilangan sel sepadan dengan header, elak baris kosong atau rosak
+                    if (cells.length === headers.length && cells.some(cell => cell.trim() !== '')) { 
+                        html += '<tr>';
+                        cells.forEach(cell => {
+                            html += `<td>${cell.trim()}</td>`;
+                        });
+                        html += '</tr>';
+                    }
+                }
+                
+                html += '</tbody>';
+                table.innerHTML = html;
+                
+                csvContent.innerHTML = ''; // Kosongkan status memuatkan
+                csvContent.appendChild(table);
+
+            })
+            .catch(error => {
+                console.error('Ralat memuatkan CSV:', error);
+                csvContent.innerHTML = `<p style="color: red;">Gagal memuatkan ${filePath}. Sila semak konsol.</p>`;
+            });
+    }
+    
+    // Panggil fungsi untuk memuatkan item pertama (TENTATIF.csv)
+    loadCSVContent(allItems[0].file);
+
 
     function loadContent(item, button) {
         document.querySelectorAll('.pdf-button').forEach(btn => {
@@ -78,9 +136,19 @@ document.addEventListener('DOMContentLoaded', function() {
         if (item.type === "pdf") {
             pdfContainer.style.display = 'block';
             uploadContainer.style.display = 'none';
+            pdfFrame.style.display = 'block';
+            csvContent.style.display = 'none'; // Sembunyikan paparan CSV
             pdfFrame.src = item.file;
             currentPdfName.textContent = item.file;
             pdfFrame.style.height = '650px'; 
+            
+        } else if (item.type === "csv") {
+            pdfContainer.style.display = 'block';
+            uploadContainer.style.display = 'none';
+            pdfFrame.style.display = 'none'; // Sembunyikan iframe
+            csvContent.style.display = 'block'; // Paparkan paparan CSV
+            currentPdfName.textContent = item.file;
+            loadCSVContent(item.file);
             
         } else if (item.type === "upload") {
             pdfContainer.style.display = 'none';
@@ -106,6 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // =================================================================
     // 🔥 3. KOD MUAT NAIK GAMBAR MENGGUNAKAN FIREBASE STORAGE
+    // Kod ini dikekalkan kerana logik 'state_changed' untuk kemajuan muat naik telah betul.
     // =================================================================
     const uploadForm = document.getElementById('upload-form');
     const imageUpload = document.getElementById('image-upload');
@@ -157,6 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
             (snapshot) => {
                 // Kemas kini status muat naik
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                // Pastikan kemajuan dipaparkan sebagai integer terhampir
                 uploadStatus.textContent = `Muat Naik: ${Math.round(progress)}% Selesai`;
                 uploadStatus.style.color = '#3498db'; 
             }, 
