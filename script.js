@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // =================================================================
     // 🔥 1. KONFIGURASI DAN INISIALISASI FIREBASE
-    // Konfigurasi dari Projek kot2025buku
     // =================================================================
     const firebaseConfig = {
         apiKey: "AIzaSyCiCwB6n2evOajLi91IKjBklWaHTPODFFk",
@@ -57,12 +56,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const pdfContainer = document.getElementById('pdf-container');
     const uploadContainer = document.getElementById('upload-container');
     const pdfFrame = document.getElementById('pdf-frame');
-    const csvContent = document.getElementById('csv-content'); // Elemen baharu untuk paparan CSV
+    const csvContent = document.getElementById('csv-content'); 
     const currentPdfName = document.getElementById('current-pdf-name');
 
     uploadContainer.style.display = 'none';
-    pdfFrame.style.display = 'none'; // Sembunyikan iframe secara lalai
-    csvContent.style.display = 'block'; // Paparkan CSV content secara lalai untuk item pertama
+    pdfFrame.style.display = 'none'; 
+    csvContent.style.display = 'block'; 
     currentPdfName.textContent = allItems[0].file;
 
     // Fungsi untuk memuatkan dan memaparkan kandungan CSV
@@ -100,11 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Baris Data (baris kedua dan seterusnya)
                 for (let i = 1; i < rows.length; i++) {
                     const cells = rows[i].split(',');
-                    // Semak jika bilangan sel sepadan dengan header, elak baris kosong atau rosak
                     if (cells.length === headers.length && cells.some(cell => cell.trim() !== '')) { 
                         html += '<tr>';
                         cells.forEach(cell => {
-                            html += `<td>${cell.trim()}</td>`;
+                            // Guna regex untuk mengendalikan petikan berganda jika ada
+                            const cellValue = cell.trim().replace(/^"|"$/g, ''); 
+                            html += `<td>${cellValue}</td>`;
                         });
                         html += '</tr>';
                     }
@@ -113,13 +113,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 html += '</tbody>';
                 table.innerHTML = html;
                 
-                csvContent.innerHTML = ''; // Kosongkan status memuatkan
+                csvContent.innerHTML = ''; 
                 csvContent.appendChild(table);
 
             })
             .catch(error => {
                 console.error('Ralat memuatkan CSV:', error);
-                csvContent.innerHTML = `<p style="color: red;">Gagal memuatkan ${filePath}. Sila semak konsol.</p>`;
+                csvContent.innerHTML = `<p style="color: red;">Gagal memuatkan ${filePath}. Sila pastikan fail wujud dan berada dalam direktori yang betul.</p>`;
             });
     }
     
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
             pdfContainer.style.display = 'block';
             uploadContainer.style.display = 'none';
             pdfFrame.style.display = 'block';
-            csvContent.style.display = 'none'; // Sembunyikan paparan CSV
+            csvContent.style.display = 'none'; 
             pdfFrame.src = item.file;
             currentPdfName.textContent = item.file;
             pdfFrame.style.height = '650px'; 
@@ -145,8 +145,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (item.type === "csv") {
             pdfContainer.style.display = 'block';
             uploadContainer.style.display = 'none';
-            pdfFrame.style.display = 'none'; // Sembunyikan iframe
-            csvContent.style.display = 'block'; // Paparkan paparan CSV
+            pdfFrame.style.display = 'none'; 
+            csvContent.style.display = 'block'; 
             currentPdfName.textContent = item.file;
             loadCSVContent(item.file);
             
@@ -174,7 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // =================================================================
     // 🔥 3. KOD MUAT NAIK GAMBAR MENGGUNAKAN FIREBASE STORAGE
-    // Kod ini dikekalkan kerana logik 'state_changed' untuk kemajuan muat naik telah betul.
     // =================================================================
     const uploadForm = document.getElementById('upload-form');
     const imageUpload = document.getElementById('image-upload');
@@ -226,7 +225,6 @@ document.addEventListener('DOMContentLoaded', function() {
             (snapshot) => {
                 // Kemas kini status muat naik
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                // Pastikan kemajuan dipaparkan sebagai integer terhampir
                 uploadStatus.textContent = `Muat Naik: ${Math.round(progress)}% Selesai`;
                 uploadStatus.style.color = '#3498db'; 
             }, 
