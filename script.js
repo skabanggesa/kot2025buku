@@ -53,7 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.text();
             })
             .then(data => {
-                const rows = data.split('\n').filter(row => row.trim() !== '');
+                // KOD DIPERBAIKI: Guna RegEx untuk split baris
+                const rows = data.split(/[\r\n]+/).filter(row => row.trim() !== '');
+                
                 if (rows.length === 0) {
                     csvContent.innerHTML = '<p>Fail CSV kosong atau tidak sah.</p>';
                     return;
@@ -103,11 +105,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Dapatkan nilai acara dari sel
                             let cellAcara = cells[idxAcara].trim();
                             
-                            // PENYEMAKAN TAHAN RAGAM (ROBUST CHECKING)
-                            if (cellAcara.toUpperCase().includes('4X100 METER')) {
-                                cellAcara = '4X100 METER BERGANTI-GANTI';
-                            }
-
+                            // *** LOGIK PENYATUAN 4X100 METER DIBUANG ***
+                            // Sekarang ia hanya membandingkan nilai mentah
+                            
                             if (cellAcara !== filter.acara) {
                                 isVisible = false;
                             }
@@ -165,11 +165,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     // DEBUG: Tambah nilai mentah sebelum penyatuan
                     uniqueAcaraRaw.add(acaraValue);
                     
-                    // PENAMBAHBAIKAN LOGIK: Guna toUpperCase() sebelum perbandingan
-                    if (acaraValue.toUpperCase().includes('4X100 METER')) {
-                        // Seragamkan semua 4X100 METER LELAKI/PEREMPUAN kepada satu kategori
-                        acaraValue = '4X100 METER BERGANTI-GANTI';
-                    }
+                    // *** LOGIK PENYATUAN 4X100 METER DIBUANG DARI SINI ***
+                    
                     if (acaraValue) uniqueAcara.add(acaraValue);
                 }
             }
@@ -177,9 +174,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // *** LOG DIAGNOSTIK BARU DITAMBAH DI SINI ***
         console.log("-----------------------------------------");
-        console.log("DIAGNOSTIK ACARA CSV:");
-        console.log("Nilai Acara UNIK MENTAH (sebelum penyatuan 4x100):", Array.from(uniqueAcaraRaw));
-        console.log("Nilai Acara UNIK AKHIR (untuk dropdown):", Array.from(uniqueAcara));
+        console.log("DIAGNOSTIK ACARA CSV (Selepas Tukar ke RELAY):");
+        console.log("Nilai Acara UNIK MENTAH:", Array.from(uniqueAcaraRaw));
         console.log("-----------------------------------------");
         // *******************************************
 
@@ -192,6 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Array.from(uniqueRumah).sort().forEach(val => {
             if (val) filterRumah.innerHTML += `<option value="${val}">${val}</option>`;
         });
+        // Menggunakan uniqueAcara (yang kini mengandungi RELAY jika ia wujud)
         Array.from(uniqueAcara).sort().forEach(val => {
             if (val) filterAcara.innerHTML += `<option value="${val}">${val}</option>`;
         });
