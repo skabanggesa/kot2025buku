@@ -2,38 +2,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // =================================================================
     // 🔥 1. KONFIGURASI DAN INISIALISASI
-    // KOD FIREBASE DIBUANG sepenuhnya kerana fungsi Muat Naik Gambar telah diganti
+    // KOD FLASH PAGE DIBUANG sepenuhnya
     // =================================================================
-    
-    // --- 1. KOD UNTUK FLASH PAGE ---
-    const flashPage = document.getElementById('flash-page');
-    const FADE_TIMEOUT_MS = 10000; 
-
-    function handleFlashPage() {
-        setTimeout(() => {
-            flashPage.classList.add('fade-out');
-            setTimeout(() => {
-                flashPage.style.display = 'none';
-            }, 1000); 
-        }, FADE_TIMEOUT_MS);
-    }
-    handleFlashPage();
-    // ---------------------------------
     
     
     // --- 2. KOD UNTUK NAVIGASI KANDUNGAN (PDF, CSV & PAUTAN LUARAN) ---
     
-    // Fail Dokumen/Kandungan (DIUBAHSUAI mengikut spesifikasi baharu)
+    // Fail Dokumen/Kandungan
     const documentFiles = [
         { name: "Tentatif Program", type: "csv", file: "TENTATIF.csv", icon: "fa-calendar-days" },
         { name: "Rekod Kejohanan", type: "pdf", file: "REKOD KEJOHANAN.pdf", icon: "fa-medal" },
-        // Item Baharu: Peserta Kejohanan menggantikan Peserta Rumah
+        // Item Baharu: Peserta Kejohanan
         { name: "Peserta Kejohanan", type: "csv-filterable", file: "peserta.csv", icon: "fa-users" },
-        // Item Baharu: Laman Keputusan menggantikan Muat Naik Gambar
+        // Item Baharu: Laman Keputusan
         { name: "Laman Keputusan", type: "link", url: "https://ediharianto1974.github.io/sukan/", icon: "fa-trophy" } 
     ];
 
-    const allItems = documentFiles; // Senarai item baharu
+    const allItems = documentFiles; 
 
     const navContainer = document.getElementById('pdf-navigation');
     const pdfContainer = document.getElementById('pdf-container');
@@ -49,10 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     pdfFrame.style.display = 'none';
     csvContent.style.display = 'block'; 
-    filterControls.style.display = 'none'; // Sembunyikan kawalan penapis secara lalai
+    filterControls.style.display = 'none'; 
     currentPdfName.textContent = allItems[0].file;
     
-    let currentData = []; // Untuk menyimpan data CSV bagi penapisan
+    let currentData = []; 
     let currentItemType = allItems[0].type;
 
     // Fungsi untuk memuatkan, memaparkan, dan MENAPIS kandungan CSV
@@ -80,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     populateFilters(rows);
                 }
                 
-                // Jika isFilterable, gunakan data tersimpan; jika tidak, gunakan data yang dimuatkan
                 const dataToProcess = isFilterable ? currentData : rows;
 
                 // Logik untuk menukar CSV kepada jadual HTML
@@ -89,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 let html = '';
                 
                 // Header (baris pertama CSV)
-                // Baris header akan dipaparkan tanpa penapisan
                 const headers = dataToProcess[0].split(',');
                 html += '<thead><tr>';
                 headers.forEach(header => {
@@ -100,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Baris Data (baris kedua dan seterusnya)
                 for (let i = 1; i < dataToProcess.length; i++) {
                     const cells = dataToProcess[i].split(',');
-                    // Laksanakan penapisan jika diperlukan
+                    
                     let isVisible = true;
                     if (isFilterable) {
                         // Indeks lajur untuk penapisan
@@ -136,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 csvContent.innerHTML = ''; 
                 csvContent.appendChild(table);
 
-                // Paparkan kawalan penapis jika ia adalah fail Peserta Kejohanan
                 if (isFilterable) {
                     filterControls.style.display = 'block';
                 }
@@ -192,7 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
             rumah: filterRumah.value
         };
         
-        // Muat semula kandungan CSV dengan penapis baharu
         loadCSVContent(document.querySelector('.pdf-button.active').dataset.file, true, filters);
     }
 
@@ -210,12 +191,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         button.classList.add('active');
         
-        currentItemType = item.type; // Kemaskini jenis item semasa
+        currentItemType = item.type; 
 
         if (item.type === "link") {
-            // Pengalihan ke URL luaran (Laman Keputusan)
             window.open(item.url, '_blank'); 
-            // Kekalkan paparan semasa tanpa perubahan pada pdf-viewer
             
         } else if (item.type === "pdf") {
             pdfContainer.style.display = 'block';
@@ -228,13 +207,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
         } else if (item.type === "csv") {
             // TENTATIF Program (CSV biasa)
-            currentData = []; // Kosongkan data penapis
+            currentData = []; 
             pdfContainer.style.display = 'block';
             filterControls.style.display = 'none';
             pdfFrame.style.display = 'none'; 
             csvContent.style.display = 'block'; 
             currentPdfName.textContent = item.file;
-            loadCSVContent(item.file, false); // 'false' menandakan ia bukan fail yang boleh ditapis
+            loadCSVContent(item.file, false); 
             
         } else if (item.type === "csv-filterable") {
              // Peserta Kejohanan (CSV dengan penapis)
@@ -242,8 +221,8 @@ document.addEventListener('DOMContentLoaded', function() {
             pdfFrame.style.display = 'none'; 
             csvContent.style.display = 'block'; 
             currentPdfName.textContent = item.file;
-            // Jika data belum dimuatkan, ia akan memuatkan dan mengisi penapis
-            // Jika sudah dimuatkan, ia akan memuatkan dengan penapis kosong
+            
+            // Muat semula dengan nilai penapis semasa (jika ada)
             loadCSVContent(item.file, true, {
                 tahun: filterTahun.value,
                 acara: filterAcara.value,
@@ -251,7 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Kemaskini tajuk Paparan Dokumen (hanya jika bukan pautan)
         if (item.type !== "link") {
              document.querySelector('.pdf-viewer h2').innerHTML = `<i class="fa-solid fa-file-pdf"></i> Paparan Dokumen`;
         }
@@ -261,7 +239,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const button = document.createElement('button');
         button.innerHTML = `<i class="fa-solid ${item.icon}"></i> ${item.name}`; 
         button.className = 'pdf-button';
-        // Simpan nama fail/url ke data-attribute untuk kegunaan penapisan
         button.dataset.file = item.file || item.url; 
         
         if (index === 0) {
