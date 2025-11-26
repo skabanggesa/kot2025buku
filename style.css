@@ -1,3 +1,5 @@
+/* style.css */
+
 /* GAYA UNTUK FLASH PAGE (SPLASH SCREEN) */
 #flash-page {
     position: fixed;
@@ -218,6 +220,48 @@ main {
     border-radius: 8px;
 }
 
+/* Gaya Kawalan Penapis */
+#filter-controls select {
+    padding: 8px;
+    margin-right: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    width: 100%; 
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+/* Gaya Jadual CSV */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    table-layout: auto; 
+}
+
+.data-table th, .data-table td {
+    border: 1px solid #e0e0e0;
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 0.9em; /* Kecilkan sedikit fon untuk CSV */
+}
+
+.data-table th {
+    background-color: #004d99;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.data-table tr:nth-child(even) {
+    background-color: #f7f7f7;
+}
+
+
 .citation {
     text-align: center;
     margin-top: 15px;
@@ -247,30 +291,36 @@ footer {
     main {
         flex-direction: column;
         padding: 0 15px;
+        margin: 15px auto;
+    }
+
+    .menu-pdf, .pdf-viewer {
+        padding: 15px;
     }
 
     .menu-pdf {
         min-width: 100%;
         margin-bottom: 15px;
-        order: 1;
+        order: 1; /* Menu di atas */
     }
 
     .pdf-viewer {
-        order: 2;
+        order: 2; /* Viewer di bawah */
     }
     
     /* Susun atur butang navigasi mendatar */
     #pdf-navigation {
         flex-direction: row;
-        overflow-x: auto;
+        overflow-x: auto; /* Membenarkan tatal mendatar */
         padding-bottom: 10px;
         gap: 10px;
     }
 
     .pdf-button {
-        flex-shrink: 0;
+        flex-shrink: 0; /* Penting: butang tidak mengecil */
         min-width: 140px;
         text-align: center;
+        font-size: 0.9em;
     }
 
     #pdf-frame {
@@ -284,17 +334,28 @@ footer {
     
     .header-icon {
         /* SAIZ BARU UNTUK KIKON & BIKON MOBILE */
-        width: 75px; /* Kecilkan sedikit ikon pada peranti mudah alih DIBESARKAN */
+        width: 60px; /* Saiz ikon pada peranti mudah alih DIKECILKAN */
     }
 
     .icon-tengah {
-        width: 80px; /* Rikon (tengah) mobile kekal saiz sedia ada */
+        width: 70px; /* Rikon (tengah) mobile DIKECILKAN */
     }
 
     header h1 {
-        font-size: 1.6em;
+        font-size: 1.4em;
     }
     
+    header p {
+        font-size: 0.9em;
+    }
+    
+    /* RESPONSIVE JADUAL CSV (penting untuk skrin kecil) */
+    .data-table th, .data-table td {
+        padding: 8px 5px;
+        font-size: 0.75em;
+    }
+
+    /* Flash Screen mobile adjustments */
     .flash-content h1 {
         font-size: 1.8em;
     }
