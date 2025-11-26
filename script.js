@@ -1,10 +1,50 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // =================================================================
-    // 🔥 1. KONFIGURASI DAN INISIALISASI
-    // KOD FLASH PAGE DIBUANG sepenuhnya
+    // 🔥 1. KONFIGURASI DAN INISIALISASI FIREBASE
+    // Konfigurasi dari Projek kot2025buku (Dikekalkan untuk konteks penuh)
     // =================================================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyCiCwB6n2evOajLi91IKjBklWaHTPODFFk",
+        authDomain: "kot2025buku.firebaseapp.com",
+        projectId: "kot2025buku",
+        storageBucket: "kot2025buku.firebasestorage.app",
+        messagingSenderId: "295981114262",
+        appId: "1:295981114262:web:ee953afd33559526efb3b7"
+    };
+
+    // Inisialisasi Firebase
+    // Hanya inisialisasi jika ia belum diinisialisasi untuk mengelakkan ralat berulang
+    let app;
+    try {
+        app = firebase.initializeApp(firebaseConfig);
+    } catch(e) {
+        app = firebase.app();
+    }
+    const storage = app.storage();
+    const storageRef = storage.ref(); 
     
+    // --- 1. KOD UNTUK FLASH PAGE (Dibiarkan untuk konteks) ---\
+    const flashPage = document.getElementById('flash-page');
+    const FADE_TIMEOUT_MS = 10000; 
+
+    function handleFlashPage() {
+        setTimeout(() => {
+            if (flashPage) { // Tambah semakan null
+                flashPage.classList.add('fade-out');
+                setTimeout(() => {
+                    flashPage.style.display = 'none';
+                }, 1000); // Masa peralihan (transition time)
+            }
+        }, FADE_TIMEOUT_MS);
+    }
+    
+    // Hanya panggil jika elemen flash page wujud
+    if (flashPage) {
+         handleFlashPage();
+    }
+    // ----------------------------------------------------------------
+
     
     // --- 2. KOD UNTUK NAVIGASI KANDUNGAN (PDF, CSV & PAUTAN LUARAN) ---
     
@@ -39,13 +79,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentData = []; 
     let currentItemType = allItems[0].type;
+    
+    const ACARA_HEADER_NAME = 'ACARA';
 
     // Fungsi untuk memuatkan, memaparkan, dan MENAPIS kandungan CSV
     function loadCSVContent(filePath, isFilterable = false, filter = {}) {
         csvContent.innerHTML = `<p>Memuatkan ${filePath}...</p>`; 
         filterControls.style.display = 'none';
-        
-        const ACARA_INDEX = 3; // Index untuk lajur ACARA (0-based)
 
         fetch(filePath)
             .then(response => {
@@ -88,21 +128,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 for (let i = 1; i < dataToProcess.length; i++) {
                     const cells = dataToProcess[i].split(',');
                     
+                    // Indeks lajur untuk penapisan
+                    const headersTrimmed = headers.map(h => h.trim().toUpperCase());
+                    const idxTahun = headersTrimmed.indexOf('TAHUN');
+                    const idxRumah = headersTrimmed.indexOf('RUMAH');
+                    const idxAcara = headersTrimmed.indexOf(ACARA_HEADER_NAME); // Akan jadi 3
+                    
                     // *** PERTAMA: SEMAK KEWUJUDAN LAJUR ACARA (TIDAK BOLEH UNDEFINED) ***
-                    if (cells.length <= ACARA_INDEX) {
+                    if (idxAcara === -1 || cells.length <= idxAcara) {
                         // Jika baris terlalu pendek, langkau terus untuk mengelakkan ralat 'trim'
-                        console.warn(`Langkau baris ${i}: Terlalu pendek untuk lajur ACARA.`);
                         continue; 
                     }
                     // *******************************************************************
                     
                     let isVisible = true;
                     if (isFilterable) {
-                        // Indeks lajur untuk penapisan
-                        const headersTrimmed = headers.map(h => h.trim().toUpperCase());
-                        const idxTahun = headersTrimmed.indexOf('TAHUN');
-                        const idxRumah = headersTrimmed.indexOf('RUMAH');
-                        const idxAcara = headersTrimmed.indexOf('ACARA'); // Akan jadi 3
                         
                         // Logik Penapisan
                         if (filter.tahun && idxTahun !== -1 && cells[idxTahun].trim() !== filter.tahun) {
@@ -112,8 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             isVisible = false;
                         }
                         if (filter.acara) {
-                            let cellAcara = cells[idxAcara].trim();
-                            // Tiada lagi logik penyatuan acara (Acara kini RELAY)
+                            let cellAcara = cells[idxAcara].trim().replace(/^"|"$/g, ''); // Buang petikan dari nilai acara
+                            // Tiada lagi logik penyatuan acara
                             
                             if (cellAcara !== filter.acara) {
                                 isVisible = false;
@@ -153,21 +193,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const headers = rows[0].split(',').map(h => h.trim().toUpperCase());
         const idxTahun = headers.indexOf('TAHUN');
         const idxRumah = headers.indexOf('RUMAH');
-        const idxAcara = headers.indexOf('ACARA'); // Akan jadi 3
+        const idxAcara = headers.indexOf(ACARA_HEADER_NAME); // Akan jadi 3
 
         const uniqueTahun = new Set();
         const uniqueRumah = new Set();
         const uniqueAcaraRaw = new Set(); 
         const uniqueAcara = new Set();
         
+        // LOG DIAGNOSTIK MUKTAMAD
+        console.log("-----------------------------------------");
+        console.log("DIAGNOSTIK ACARA CSV (DEBUG MUKTAMAD):");
+        console.log("HEADERS DITEMUI:", headers);
+        console.log("INDEX ACARA (idxAcara):", idxAcara);
+        
+        if (idxAcara === -1) {
+             console.error("Ralat: Gagal mencari lajur 'ACARA'. Sila semak ejaan header.");
+        }
+        // **************************************************
+        
         for (let i = 1; i < rows.length; i++) {
             const cells = rows[i].split(',');
             
-            // *** PERTAMA: SEMAK KEWUJUDAN LAJUR ACARA (TIDAK BOLEH UNDEFINED) ***
             if (cells.length <= idxAcara) {
                 continue; 
             }
-            // *******************************************************************
             
             if (cells.length === headers.length) { // Semak jika bilangan sel sepadan dengan header
                 if (idxTahun !== -1) uniqueTahun.add(cells[idxTahun].trim());
@@ -175,10 +224,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 
                 if (idxAcara !== -1) {
-                    let acaraValue = cells[idxAcara].trim();
+                    let acaraValue = cells[idxAcara].trim().replace(/^"|"$/g, '');
                     
                     // DEBUG: Tambah nilai mentah
                     uniqueAcaraRaw.add(acaraValue);
+                    
+                    // Tambah log khas untuk baris RELAY (atau baris yang mungkin bermasalah)
+                    if (acaraValue.toUpperCase().includes('RELAY') || i < 5 || i > rows.length - 5) { 
+                        console.log(`Baris ${i} (Acara Mentah): ${acaraValue}`);
+                    }
                     
                     // TIADA LOGIK PENYATUAN ACARA: Hanya tambah nilai acara yang ditemui
                     if (acaraValue) uniqueAcara.add(acaraValue);
@@ -188,8 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // LOG DIAGNOSTIK
         console.log("-----------------------------------------");
-        console.log("DIAGNOSTIK ACARA CSV (Selepas Tukar ke RELAY):");
-        console.log("Nilai Acara UNIK MENTAH:", Array.from(uniqueAcaraRaw));
+        console.log("Nilai Acara UNIK AKHIR:", Array.from(uniqueAcara));
         console.log("-----------------------------------------");
         
         // Bersihkan dan isi dropdown
@@ -276,6 +329,70 @@ document.addEventListener('DOMContentLoaded', function() {
         if (item.type !== "link") {
              document.querySelector('.pdf-viewer h2').innerHTML = `<i class="fa-solid fa-file-pdf"></i> Paparan Dokumen`;
         }
+    }
+    
+    // KOD FIREBASE (Dikekalkan di sini)
+    const uploadForm = document.getElementById('upload-form');
+    const imageUpload = document.getElementById('image-upload');
+    const uploadStatus = document.getElementById('upload-status');
+    const uploadedImagePreview = document.getElementById('uploaded-image-preview');
+    const previewCaption = document.getElementById('preview-caption');
+
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const file = imageUpload.files[0];
+            
+            if (!file) {
+                uploadStatus.textContent = "Sila pilih fail untuk dimuat naik.";
+                uploadStatus.style.color = 'red';
+                return;
+            }
+            
+            uploadStatus.textContent = "Memuat naik...";
+            uploadStatus.style.color = 'blue';
+
+            // Nama fail unik
+            const uniqueFileName = `${Date.now()}_${file.name}`;
+            const imageRef = storageRef.child('images/' + uniqueFileName);
+            
+            const uploadTask = imageRef.put(file);
+
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    uploadStatus.textContent = `Muat naik: ${progress.toFixed(2)}%`;
+                }, 
+                (error) => {
+                    console.error("Ralat Muat Naik Firebase:", error);
+                    uploadStatus.textContent = `Muat naik gagal. Sila cuba lagi. Ralat: ${error.message}`;
+                    uploadStatus.style.color = 'red';
+                }, 
+                () => {
+                    // Muat naik berjaya!
+                    uploadStatus.textContent = `Muat naik berjaya! Mencari URL...`;
+                    
+                    // Dapatkan URL muat turun
+                    imageRef.getDownloadURL().then((downloadURL) => {
+                        
+                        uploadStatus.textContent = "Muat naik berjaya! Gambar telah disimpan di pelayan.";
+                        uploadStatus.style.color = 'green';
+                        imageUpload.value = ''; // Kosongkan input
+                        
+                        // Paparkan Gambar dari Firebase URL
+                        uploadedImagePreview.src = downloadURL; 
+                        uploadedImagePreview.style.display = 'block';
+                        previewCaption.textContent = `Pratonton gambar yang baru dimuat naik: ${uniqueFileName}`;
+                        previewCaption.style.display = 'block';
+
+                    }).catch((error) => {
+                        console.error("Ralat mendapatkan URL:", error);
+                        uploadStatus.textContent = "Muat naik berjaya, tetapi gagal mendapatkan URL gambar.";
+                        uploadStatus.style.color = 'orange';
+                    });
+                }
+            );
+        });
     }
 
     allItems.forEach((item, index) => {
