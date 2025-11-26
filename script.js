@@ -1,52 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     
-    // =================================================================
-    // 🔥 1. KONFIGURASI DAN INISIALISASI FIREBASE
-    // Konfigurasi dari Projek kot2025buku (Dikekalkan untuk konteks penuh)
-    // =================================================================
-    const firebaseConfig = {
-        apiKey: "AIzaSyCiCwB6n2evOajLi91IKjBklWaHTPODFFk",
-        authDomain: "kot2025buku.firebaseapp.com",
-        projectId: "kot2025buku",
-        storageBucket: "kot2025buku.firebasestorage.app",
-        messagingSenderId: "295981114262",
-        appId: "1:295981114262:web:ee953afd33559526efb3b7"
-    };
-
-    // Inisialisasi Firebase
-    // Hanya inisialisasi jika ia belum diinisialisasi untuk mengelakkan ralat berulang
-    let app;
-    try {
-        app = firebase.initializeApp(firebaseConfig);
-    } catch(e) {
-        app = firebase.app();
-    }
-    const storage = app.storage();
-    const storageRef = storage.ref(); 
-    
-    // --- 1. KOD UNTUK FLASH PAGE (Dibiarkan untuk konteks) ---\
-    const flashPage = document.getElementById('flash-page');
-    const FADE_TIMEOUT_MS = 10000; 
-
-    function handleFlashPage() {
-        setTimeout(() => {
-            if (flashPage) { // Tambah semakan null
-                flashPage.classList.add('fade-out');
-                setTimeout(() => {
-                    flashPage.style.display = 'none';
-                }, 1000); // Masa peralihan (transition time)
-            }
-        }, FADE_TIMEOUT_MS);
-    }
-    
-    // Hanya panggil jika elemen flash page wujud
-    if (flashPage) {
-         handleFlashPage();
-    }
-    // ----------------------------------------------------------------
-
-    
-    // --- 2. KOD UNTUK NAVIGASI KANDUNGAN (PDF, CSV & PAUTAN LUARAN) ---
+    // --- 1. KOD UNTUK NAVIGASI KANDUNGAN (PDF, CSV & PAUTAN LUARAN) ---
     
     // Fail Dokumen/Kandungan
     const documentFiles = [
@@ -330,70 +284,9 @@ document.addEventListener('DOMContentLoaded', function() {
              document.querySelector('.pdf-viewer h2').innerHTML = `<i class="fa-solid fa-file-pdf"></i> Paparan Dokumen`;
         }
     }
-    
-    // KOD FIREBASE (Dikekalkan di sini)
-    const uploadForm = document.getElementById('upload-form');
-    const imageUpload = document.getElementById('image-upload');
-    const uploadStatus = document.getElementById('upload-status');
-    const uploadedImagePreview = document.getElementById('uploaded-image-preview');
-    const previewCaption = document.getElementById('preview-caption');
 
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const file = imageUpload.files[0];
-            
-            if (!file) {
-                uploadStatus.textContent = "Sila pilih fail untuk dimuat naik.";
-                uploadStatus.style.color = 'red';
-                return;
-            }
-            
-            uploadStatus.textContent = "Memuat naik...";
-            uploadStatus.style.color = 'blue';
-
-            // Nama fail unik
-            const uniqueFileName = `${Date.now()}_${file.name}`;
-            const imageRef = storageRef.child('images/' + uniqueFileName);
-            
-            const uploadTask = imageRef.put(file);
-
-            uploadTask.on('state_changed', 
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    uploadStatus.textContent = `Muat naik: ${progress.toFixed(2)}%`;
-                }, 
-                (error) => {
-                    console.error("Ralat Muat Naik Firebase:", error);
-                    uploadStatus.textContent = `Muat naik gagal. Sila cuba lagi. Ralat: ${error.message}`;
-                    uploadStatus.style.color = 'red';
-                }, 
-                () => {
-                    // Muat naik berjaya!
-                    uploadStatus.textContent = `Muat naik berjaya! Mencari URL...`;
-                    
-                    // Dapatkan URL muat turun
-                    imageRef.getDownloadURL().then((downloadURL) => {
-                        
-                        uploadStatus.textContent = "Muat naik berjaya! Gambar telah disimpan di pelayan.";
-                        uploadStatus.style.color = 'green';
-                        imageUpload.value = ''; // Kosongkan input
-                        
-                        // Paparkan Gambar dari Firebase URL
-                        uploadedImagePreview.src = downloadURL; 
-                        uploadedImagePreview.style.display = 'block';
-                        previewCaption.textContent = `Pratonton gambar yang baru dimuat naik: ${uniqueFileName}`;
-                        previewCaption.style.display = 'block';
-
-                    }).catch((error) => {
-                        console.error("Ralat mendapatkan URL:", error);
-                        uploadStatus.textContent = "Muat naik berjaya, tetapi gagal mendapatkan URL gambar.";
-                        uploadStatus.style.color = 'orange';
-                    });
-                }
-            );
-        });
-    }
+    // KOD FLASH PAGE (Dibuang)
+    // KOD FIREBASE (Dibuang)
 
     allItems.forEach((item, index) => {
         const button = document.createElement('button');
