@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fail Dokumen/Kandungan
     const documentFiles = [
         { name: "Tentatif Program", type: "csv", file: "TENTATIF.csv", icon: "fa-calendar-days" },
-        { name: "Rekod Kejohanan", type: "pdf", file: "REKOD KEJOHANAN.pdf", icon: "fa-medal" },
+        // PERUBAHAN DI SINI: Tukar Rekod Kejohanan dari PDF ke CSV (rekod.csv)
+        { name: "Rekod Kejohanan", type: "csv", file: "rekod.csv", icon: "fa-medal" },
         // Item Baharu: Peserta Kejohanan
         { name: "Peserta Kejohanan", type: "csv-filterable", file: "peserta.csv", icon: "fa-users" },
         // Item Baharu: Laman Keputusan
@@ -252,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
             pdfFrame.style.height = '650px'; 
             
         } else if (item.type === "csv") {
-            // TENTATIF Program (CSV biasa)
+            // CSV biasa (Termasuk TENTATIF Program dan REKOD Kejohanan yang baru)
             currentData = []; 
             pdfContainer.style.display = 'block';
             filterControls.style.display = 'none';
