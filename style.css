@@ -99,19 +99,17 @@ header {
 
 /* GAYA HEADER BARU DENGAN IMEJ */
 .header-content-custom {
-    display: flex; /* Aktifkan Flexbox */
-    align-items: center; /* Selarikan item secara menegak */
-    justify-content: space-between; /* Jarak antara item */
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
     margin-bottom: 10px;
-    padding: 0 15px; /* Jarak di tepi */
+    padding: 0 15px; 
 }
 
 .header-icon {
-    /* SAIZ BARU UNTUK KIKON & BIKON */
-    width: 100px; /* Saiz imej standard DIBESARKAN */
+    width: 100px; 
     height: auto;
     object-fit: contain;
-    /* Efek pantulan untuk imej yang mengadap ke dalam */
     transform: scaleX(1); 
 }
 
@@ -122,15 +120,15 @@ header {
 
 .main-title-container {
     display: flex;
-    flex-direction: column; /* Ikon di atas, H1 di bawah */
+    flex-direction: column; 
     align-items: center;
     text-align: center;
-    flex-grow: 1; /* Benarkan ia mengambil ruang tengah */
+    flex-grow: 1; 
     margin: 0 10px;
 }
 
 .icon-tengah {
-    width: 110px; /* Rikon (tengah) kekal saiz sedia ada */
+    width: 110px; 
     margin-bottom: 5px;
 }
 
@@ -286,7 +284,7 @@ footer {
     font-size: 0.9em;
 }
 
-/* 📱 Reka Bentuk Responsif (untuk peranti mudah alih) */
+/* 📱 Reka Bentuk Responsif (Breakpoint Tablet/Telefon Besar) */
 @media (max-width: 850px) {
     main {
         flex-direction: column;
@@ -317,28 +315,41 @@ footer {
     }
 
     .pdf-button {
-        flex-shrink: 0; /* Penting: butang tidak mengecil */
+        flex-shrink: 0; 
         min-width: 140px;
         text-align: center;
         font-size: 0.9em;
+    }
+    
+    #csv-content {
+        overflow-x: auto; /* Memastikan tatal mendatar untuk jadual */
+    }
+
+    .data-table {
+        min-width: 500px; /* Menetapkan lebar minimum untuk memastikan tatal mendatar */
+    }
+
+    .data-table th, .data-table td {
+        padding: 8px 5px;
+        font-size: 0.75em;
+        min-width: 80px;
     }
 
     #pdf-frame {
         height: 400px;
     }
     
-    /* RESPONSIVE HEADER BARU */
+    /* RESPONSIVE HEADER */
     .header-content-custom {
         padding: 0 5px;
     }
     
     .header-icon {
-        /* SAIZ BARU UNTUK KIKON & BIKON MOBILE */
-        width: 60px; /* Saiz ikon pada peranti mudah alih DIKECILKAN */
+        width: 60px; 
     }
 
     .icon-tengah {
-        width: 70px; /* Rikon (tengah) mobile DIKECILKAN */
+        width: 70px; 
     }
 
     header h1 {
@@ -349,12 +360,6 @@ footer {
         font-size: 0.9em;
     }
     
-    /* RESPONSIVE JADUAL CSV (penting untuk skrin kecil) */
-    .data-table th, .data-table td {
-        padding: 8px 5px;
-        font-size: 0.75em;
-    }
-
     /* Flash Screen mobile adjustments */
     .flash-content h1 {
         font-size: 1.8em;
@@ -362,5 +367,62 @@ footer {
 
     .flash-content h2 {
         font-size: 1.2em;
+    }
+}
+
+/* 📱📱 PENAMBAHBAIKAN UTAMA: BREAKPOINT ULTRA-SEMPIT (Skrin 3-5 Inci) */
+@media (max-width: 480px) {
+    
+    header {
+        padding: 15px 5px; 
+    }
+    
+    .header-content-custom {
+        padding: 0 0px; 
+    }
+    
+    .header-icon {
+        width: 45px; /* Ikon lebih kecil */
+    }
+
+    .icon-tengah {
+        width: 55px; /* Ikon tengah lebih kecil */
+    }
+
+    header h1 {
+        font-size: 1.1em; /* Saiz fon tajuk utama yang paling kecil */
+    }
+    
+    header p {
+        font-size: 0.75em;
+    }
+    
+    main {
+        padding: 0 5px; 
+    }
+    
+    .menu-pdf h2, .pdf-viewer h2 {
+        font-size: 1.1em; 
+        padding-bottom: 5px;
+    }
+    
+    /* Filter controls */
+    #filter-controls select {
+        font-size: 0.85em;
+        margin-bottom: 5px; 
+    }
+    
+    /* Butang Navigasi */
+    .pdf-button {
+        min-width: 100px; /* Lebar minimum butang diringkaskan */
+        font-size: 0.8em;
+        padding: 6px 8px;
+    }
+    
+    /* CSV Table (Tatal Mendatar adalah Kunci) */
+    .data-table th, .data-table td {
+        padding: 5px 3px; /* Padding sel dikurangkan ke tahap minimum */
+        font-size: 0.7em; /* Saiz fon paling kecil */
+        min-width: 60px; /* Lebar minimum sel yang lebih kecil */
     }
 }
