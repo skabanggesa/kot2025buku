@@ -100,9 +100,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             isVisible = false;
                         }
                         if (filter.acara) {
-                            // Dapatkan nilai acara dari sel, kemudian ganti jika ia adalah lari berganti-ganti
+                            // Dapatkan nilai acara dari sel
                             let cellAcara = cells[idxAcara].trim();
-                            if (cellAcara.includes('4X100 METER')) {
+                            
+                            // *** PENYEMAKAN TAHAN RAGAM (ROBUST CHECKING) ***
+                            if (cellAcara.toUpperCase().includes('4X100 METER')) {
                                 cellAcara = '4X100 METER BERGANTI-GANTI';
                             }
 
@@ -155,16 +157,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (idxTahun !== -1) uniqueTahun.add(cells[idxTahun].trim());
                 if (idxRumah !== -1) uniqueRumah.add(cells[idxRumah].trim());
                 
-                // *** LOGIK BAHARU UNTUK 4X100 METER DITAMBAH DI SINI ***
+                
                 if (idxAcara !== -1) {
                     let acaraValue = cells[idxAcara].trim();
-                    if (acaraValue.includes('4X100 METER')) {
+                    // *** PENAMBAHBAIKAN LOGIK: Guna toUpperCase() sebelum perbandingan ***
+                    if (acaraValue.toUpperCase().includes('4X100 METER')) {
                         // Seragamkan semua 4X100 METER LELAKI/PEREMPUAN kepada satu kategori
                         acaraValue = '4X100 METER BERGANTI-GANTI';
                     }
                     if (acaraValue) uniqueAcara.add(acaraValue);
                 }
-                // *******************************************************
             }
         }
         
