@@ -44,6 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadCSVContent(filePath, isFilterable = false, filter = {}) {
         csvContent.innerHTML = `<p>Memuatkan ${filePath}...</p>`; 
         filterControls.style.display = 'none';
+        
+        const ACARA_INDEX = 3; // Index untuk lajur ACARA (0-based)
 
         fetch(filePath)
             .then(response => {
@@ -86,14 +88,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 for (let i = 1; i < dataToProcess.length; i++) {
                     const cells = dataToProcess[i].split(',');
                     
+                    // *** PERTAMA: SEMAK KEWUJUDAN LAJUR ACARA (TIDAK BOLEH UNDEFINED) ***
+                    if (cells.length <= ACARA_INDEX) {
+                        // Jika baris terlalu pendek, langkau terus untuk mengelakkan ralat 'trim'
+                        console.warn(`Langkau baris ${i}: Terlalu pendek untuk lajur ACARA.`);
+                        continue; 
+                    }
+                    // *******************************************************************
+                    
                     let isVisible = true;
                     if (isFilterable) {
                         // Indeks lajur untuk penapisan
                         const headersTrimmed = headers.map(h => h.trim().toUpperCase());
                         const idxTahun = headersTrimmed.indexOf('TAHUN');
                         const idxRumah = headersTrimmed.indexOf('RUMAH');
-                        const idxAcara = headersTrimmed.indexOf('ACARA');
-
+                        const idxAcara = headersTrimmed.indexOf('ACARA'); // Akan jadi 3
+                        
                         // Logik Penapisan
                         if (filter.tahun && idxTahun !== -1 && cells[idxTahun].trim() !== filter.tahun) {
                             isVisible = false;
@@ -102,11 +112,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             isVisible = false;
                         }
                         if (filter.acara) {
-                            // Dapatkan nilai acara dari sel
                             let cellAcara = cells[idxAcara].trim();
-                            
-                            // *** LOGIK PENYATUAN 4X100 METER DIBUANG ***
-                            // Sekarang ia hanya membandingkan nilai mentah
+                            // Tiada lagi logik penyatuan acara (Acara kini RELAY)
                             
                             if (cellAcara !== filter.acara) {
                                 isVisible = false;
@@ -117,7 +124,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (isVisible && cells.length === headers.length && cells.some(cell => cell.trim() !== '')) { 
                         html += '<tr>';
                         cells.forEach(cell => {
-                            html += `<td>${cell.trim()}</td>`;
+                            // Guna regex untuk keluarkan petikan berganda jika ada
+                            html += `<td>${cell.trim().replace(/^"|"$/g, '')}</td>`;
                         });
                         html += '</tr>';
                     }
@@ -145,16 +153,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const headers = rows[0].split(',').map(h => h.trim().toUpperCase());
         const idxTahun = headers.indexOf('TAHUN');
         const idxRumah = headers.indexOf('RUMAH');
-        const idxAcara = headers.indexOf('ACARA');
+        const idxAcara = headers.indexOf('ACARA'); // Akan jadi 3
 
         const uniqueTahun = new Set();
         const uniqueRumah = new Set();
-        const uniqueAcaraRaw = new Set(); // Set untuk nilai mentah
+        const uniqueAcaraRaw = new Set(); 
         const uniqueAcara = new Set();
         
         for (let i = 1; i < rows.length; i++) {
             const cells = rows[i].split(',');
-            if (cells.length === headers.length) {
+            
+            // *** PERTAMA: SEMAK KEWUJUDAN LAJUR ACARA (TIDAK BOLEH UNDEFINED) ***
+            if (cells.length <= idxAcara) {
+                continue; 
+            }
+            // *******************************************************************
+            
+            if (cells.length === headers.length) { // Semak jika bilangan sel sepadan dengan header
                 if (idxTahun !== -1) uniqueTahun.add(cells[idxTahun].trim());
                 if (idxRumah !== -1) uniqueRumah.add(cells[idxRumah].trim());
                 
@@ -162,23 +177,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (idxAcara !== -1) {
                     let acaraValue = cells[idxAcara].trim();
                     
-                    // DEBUG: Tambah nilai mentah sebelum penyatuan
+                    // DEBUG: Tambah nilai mentah
                     uniqueAcaraRaw.add(acaraValue);
                     
-                    // *** LOGIK PENYATUAN 4X100 METER DIBUANG DARI SINI ***
-                    
+                    // TIADA LOGIK PENYATUAN ACARA: Hanya tambah nilai acara yang ditemui
                     if (acaraValue) uniqueAcara.add(acaraValue);
                 }
             }
         }
         
-        // *** LOG DIAGNOSTIK BARU DITAMBAH DI SINI ***
+        // LOG DIAGNOSTIK
         console.log("-----------------------------------------");
         console.log("DIAGNOSTIK ACARA CSV (Selepas Tukar ke RELAY):");
         console.log("Nilai Acara UNIK MENTAH:", Array.from(uniqueAcaraRaw));
         console.log("-----------------------------------------");
-        // *******************************************
-
+        
         // Bersihkan dan isi dropdown
         [filterTahun, filterAcara, filterRumah].forEach(dropdown => dropdown.innerHTML = `<option value="">Semua ${dropdown.id.split('-')[1].charAt(0).toUpperCase() + dropdown.id.split('-')[1].slice(1)}</option>`);
 
@@ -188,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Array.from(uniqueRumah).sort().forEach(val => {
             if (val) filterRumah.innerHTML += `<option value="${val}">${val}</option>`;
         });
-        // Menggunakan uniqueAcara (yang kini mengandungi RELAY jika ia wujud)
+        // Menggunakan uniqueAcara 
         Array.from(uniqueAcara).sort().forEach(val => {
             if (val) filterAcara.innerHTML += `<option value="${val}">${val}</option>`;
         });
