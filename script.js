@@ -79,21 +79,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 html += '</tr></thead><tbody>';
                 
                 // Baris Data (baris kedua dan seterusnya)
+                const headersTrimmed = headers.map(h => h.trim().toUpperCase());
+                const idxAcara = headersTrimmed.indexOf(ACARA_HEADER_NAME); // Akan jadi 3
+                const idxTahun = headersTrimmed.indexOf('TAHUN');
+                const idxRumah = headersTrimmed.indexOf('RUMAH');
+                
                 for (let i = 1; i < dataToProcess.length; i++) {
                     const cells = dataToProcess[i].split(',');
                     
-                    // Indeks lajur untuk penapisan
-                    const headersTrimmed = headers.map(h => h.trim().toUpperCase());
-                    const idxTahun = headersTrimmed.indexOf('TAHUN');
-                    const idxRumah = headersTrimmed.indexOf('RUMAH');
-                    const idxAcara = headersTrimmed.indexOf(ACARA_HEADER_NAME); // Akan jadi 3
-                    
-                    // *** PERTAMA: SEMAK KEWUJUDAN LAJUR ACARA (TIDAK BOLEH UNDEFINED) ***
+                    // Semakan minimum: memastikan lajur ACARA wujud
                     if (idxAcara === -1 || cells.length <= idxAcara) {
-                        // Jika baris terlalu pendek, langkau terus untuk mengelakkan ralat 'trim'
                         continue; 
                     }
-                    // *******************************************************************
                     
                     let isVisible = true;
                     if (isFilterable) {
@@ -106,23 +103,26 @@ document.addEventListener('DOMContentLoaded', function() {
                             isVisible = false;
                         }
                         if (filter.acara) {
-                            let cellAcara = cells[idxAcara].trim().replace(/^"|"$/g, ''); // Buang petikan dari nilai acara
-                            // Tiada lagi logik penyatuan acara
+                            let cellAcara = cells[idxAcara].trim().replace(/^"|"$/g, ''); 
                             
                             if (cellAcara !== filter.acara) {
                                 isVisible = false;
                             }
                         }
                     }
-
-                    if (isVisible && cells.length === headers.length && cells.some(cell => cell.trim() !== '')) { 
+                    
+                    // *** KOD DIPERBAIKI DI SINI: TIDAK LAGI SEMAK cells.length === headers.length ***
+                    if (isVisible && cells.some(cell => cell.trim() !== '')) { 
                         html += '<tr>';
-                        cells.forEach(cell => {
-                            // Guna regex untuk keluarkan petikan berganda jika ada
-                            html += `<td>${cell.trim().replace(/^"|"$/g, '')}</td>`;
-                        });
+                        // Guna headers.length untuk memastikan hanya memaparkan lajur yang dinamakan (7 lajur)
+                        // Jika baris data mempunyai 13 lajur, 6 yang terakhir diabaikan
+                        for (let j = 0; j < headers.length; j++) {
+                             // Guna regex untuk keluarkan petikan berganda jika ada (penting untuk nama yang ada koma)
+                            html += `<td>${(cells[j] || '').trim().replace(/^"|"$/g, '')}</td>`;
+                        }
                         html += '</tr>';
                     }
+                    // ********************************************************************************
                 }
                 
                 html += '</tbody>';
@@ -151,7 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const uniqueTahun = new Set();
         const uniqueRumah = new Set();
-        const uniqueAcaraRaw = new Set(); 
         const uniqueAcara = new Set();
         
         // LOG DIAGNOSTIK MUKTAMAD
@@ -168,30 +167,27 @@ document.addEventListener('DOMContentLoaded', function() {
         for (let i = 1; i < rows.length; i++) {
             const cells = rows[i].split(',');
             
+            // *** KOD DIPERBAIKI DI SINI ***
+            // Semak hanya jika lajur ACARA boleh dicapai
             if (cells.length <= idxAcara) {
                 continue; 
             }
+            // *******************************
             
-            if (cells.length === headers.length) { // Semak jika bilangan sel sepadan dengan header
-                if (idxTahun !== -1) uniqueTahun.add(cells[idxTahun].trim());
-                if (idxRumah !== -1) uniqueRumah.add(cells[idxRumah].trim());
+            if (idxAcara !== -1) {
+                let acaraValue = cells[idxAcara].trim().replace(/^"|"$/g, '');
                 
-                
-                if (idxAcara !== -1) {
-                    let acaraValue = cells[idxAcara].trim().replace(/^"|"$/g, '');
-                    
-                    // DEBUG: Tambah nilai mentah
-                    uniqueAcaraRaw.add(acaraValue);
-                    
-                    // Tambah log khas untuk baris RELAY (atau baris yang mungkin bermasalah)
-                    if (acaraValue.toUpperCase().includes('RELAY') || i < 5 || i > rows.length - 5) { 
-                        console.log(`Baris ${i} (Acara Mentah): ${acaraValue}`);
-                    }
-                    
-                    // TIADA LOGIK PENYATUAN ACARA: Hanya tambah nilai acara yang ditemui
-                    if (acaraValue) uniqueAcara.add(acaraValue);
+                // Tambah log khas untuk baris RELAY 
+                if (acaraValue.toUpperCase().includes('RELAY')) { 
+                    console.log(`🎉 Baris ${i} (Acara Mentah DITEMUI): ${acaraValue}`);
                 }
+                
+                if (acaraValue) uniqueAcara.add(acaraValue);
             }
+            
+            // Tambah TAHUN dan RUMAH (tanpa semakan cells.length)
+            if (idxTahun !== -1 && cells.length > idxTahun) uniqueTahun.add(cells[idxTahun].trim());
+            if (idxRumah !== -1 && cells.length > idxRumah) uniqueRumah.add(cells[idxRumah].trim());
         }
         
         // LOG DIAGNOSTIK
@@ -284,9 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
              document.querySelector('.pdf-viewer h2').innerHTML = `<i class="fa-solid fa-file-pdf"></i> Paparan Dokumen`;
         }
     }
-
-    // KOD FLASH PAGE (Dibuang)
-    // KOD FIREBASE (Dibuang)
 
     allItems.forEach((item, index) => {
         const button = document.createElement('button');
