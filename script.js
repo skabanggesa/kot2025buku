@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Dapatkan nilai acara dari sel
                             let cellAcara = cells[idxAcara].trim();
                             
-                            // *** PENYEMAKAN TAHAN RAGAM (ROBUST CHECKING) ***
+                            // PENYEMAKAN TAHAN RAGAM (ROBUST CHECKING)
                             if (cellAcara.toUpperCase().includes('4X100 METER')) {
                                 cellAcara = '4X100 METER BERGANTI-GANTI';
                             }
@@ -149,6 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const uniqueTahun = new Set();
         const uniqueRumah = new Set();
+        const uniqueAcaraRaw = new Set(); // Set untuk nilai mentah
         const uniqueAcara = new Set();
         
         for (let i = 1; i < rows.length; i++) {
@@ -160,7 +161,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (idxAcara !== -1) {
                     let acaraValue = cells[idxAcara].trim();
-                    // *** PENAMBAHBAIKAN LOGIK: Guna toUpperCase() sebelum perbandingan ***
+                    
+                    // DEBUG: Tambah nilai mentah sebelum penyatuan
+                    uniqueAcaraRaw.add(acaraValue);
+                    
+                    // PENAMBAHBAIKAN LOGIK: Guna toUpperCase() sebelum perbandingan
                     if (acaraValue.toUpperCase().includes('4X100 METER')) {
                         // Seragamkan semua 4X100 METER LELAKI/PEREMPUAN kepada satu kategori
                         acaraValue = '4X100 METER BERGANTI-GANTI';
@@ -170,6 +175,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // *** LOG DIAGNOSTIK BARU DITAMBAH DI SINI ***
+        console.log("-----------------------------------------");
+        console.log("DIAGNOSTIK ACARA CSV:");
+        console.log("Nilai Acara UNIK MENTAH (sebelum penyatuan 4x100):", Array.from(uniqueAcaraRaw));
+        console.log("Nilai Acara UNIK AKHIR (untuk dropdown):", Array.from(uniqueAcara));
+        console.log("-----------------------------------------");
+        // *******************************************
+
         // Bersihkan dan isi dropdown
         [filterTahun, filterAcara, filterRumah].forEach(dropdown => dropdown.innerHTML = `<option value="">Semua ${dropdown.id.split('-')[1].charAt(0).toUpperCase() + dropdown.id.split('-')[1].slice(1)}</option>`);
 
